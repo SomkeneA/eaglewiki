@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect
 from django.http import Http404
 from .util import get_entry, list_entries, save_entry
-from .forms import EntryForm
+from .forms import EntryForm, EditEntryForm
 import random
+from django.contrib import messages
 from . import util
+import markdown2
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
@@ -15,29 +17,12 @@ def entry_page(request, title):
     entry_content = get_entry(title)
 
     # Check if the entry exists
+
     if entry_content is None:
-        # Raise a 404 Not Found exception if the entry does not exist
-        raise Http404("Entry does not exist")
-
+        return render(request, "not_found.html", {"title": title})
+    html_content = markdown2.markdown(entry_content)
+    return render(request, "entry.html", {"title": title, "entry_content": html_content})
     # Render the entry page template with the entry content
-    return render(request, "entry.html", {
-        "title": title,
-        "content": entry_content
-    })
-def entry_page(request, title):
-    # Retrieve the contents of the entry with the provided title
-    entry_content = get_entry(title)
-
-    # Check if the entry exists
-    if entry_content is None:
-        # Raise a 404 Not Found exception if the entry does not exist
-        raise Http404("Entry does not exist")
-
-    # Render the entry page template with the entry content
-    return render(request, "entry.html", {
-        "title": title,
-        "content": entry_content
-    })
 
 def search(request):
     query = request.GET.get('q')
@@ -60,7 +45,11 @@ def create_new_page(request):
         if form.is_valid():
             title = form.cleaned_data["title"]
             content = form.cleaned_data["content"]
-            save_entry(title, content)  # Save the new entry
+            existing_entries = list_entries()
+            if title.lower() in [entry.lower() for entry in existing_entries]:
+                messages.error(request, f"An entry with the title '{title}' already exists.")
+            else:
+                save_entry(title, content)  # Save the new entry
             return redirect("entry_page", title=title)  # Redirect to the newly created entry page
     else:
         form = EntryForm()
@@ -71,3 +60,15 @@ def random_page(request):
     entries = list_entries()
     random_entry = random.choice(entries)
     return redirect('entry_page', title=random_entry)
+
+def edit_page(request, title):
+    content = get_entry(title)
+    if request.method == "POST":
+        form = EditEntryForm(request.POST)
+        if form.is_valid():
+            new_content = form.cleaned_data["content"]
+            save_entry(title, new_content)
+            return redirect('entry_page', title=title)
+    else:
+        form = EditEntryForm(initial={"content": content})
+    return render(request, "edit_page.html", {"form": form, "title": title})
