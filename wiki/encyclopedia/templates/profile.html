@@ -1,0 +1,9 @@
+{% extends 'encyclopedia/layout.html' %}
+{% block title %}User Profile{% endblock %}
+
+{% block body %}
+<h2>User Profile</h2>
+<p>Username: {{ user_profile.user.username }}</p>
+<p>Email: {{ user_profile.user.email }}</p>
+<!-- Add more profile information as needed -->
+{% endblock %}

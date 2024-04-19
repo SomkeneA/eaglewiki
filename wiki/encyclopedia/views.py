@@ -1,11 +1,14 @@
+from collections import UserDict
 from django.shortcuts import render, redirect
 from django.http import Http404
 from .util import get_entry, list_entries, save_entry
-from .forms import EntryForm, EditEntryForm
+from .forms import EntryForm, EditEntryForm, UserRegistrationForm
 import random
 from django.contrib import messages
 from . import util
 import markdown2
+from .models import UserProfile
+from django.contrib.auth.models import User
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
@@ -72,3 +75,24 @@ def edit_page(request, title):
     else:
         form = EditEntryForm(initial={"content": content})
     return render(request, "edit_page.html", {"form": form, "title": title})
+
+def register(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            UserProfile.objects.create(user=form.save())
+            return redirect('login')  # Redirect to login page after successful registration
+    else:
+        form = UserRegistrationForm()
+    return render(request, 'registration/register.html', {'form': form})
+
+
+def profile(request):
+    # Retrieve the UserProfile associated with the current user
+    custom_user = User.objects.get(id=request.user.id)
+    user_profile = UserProfile.objects.get(user=custom_user)
+    context = {
+        'user_profile': user_profile
+    }
+    return render(request, 'profile.html', context)
