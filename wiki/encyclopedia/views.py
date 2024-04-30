@@ -7,13 +7,12 @@ import random
 from django.contrib import messages
 from . import util
 import markdown2
-from .models import UserProfile
+from .models import UserProfile, Entry
 from django.contrib.auth.models import User
 
 def index(request):
-    return render(request, "encyclopedia/index.html", {
-        "entries": util.list_entries()
-    })
+    entries = Entry.objects.all()  # Fetch all entries from the database
+    return render(request, 'index.html', {'entries': entries})
 
 def entry_page(request, title):
     # Retrieve the contents of the entry with the provided title
