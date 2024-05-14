@@ -11,6 +11,10 @@ class UserProfile(models.Model):
 class Entry(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
+    image = models.ImageField(upload_to='images/', null=True, blank=True)
+    category = models.CharField(max_length=100, null=True, blank=True)
+    tag = models.CharField(max_length=100, null=True, blank=True)
+    reference = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.title

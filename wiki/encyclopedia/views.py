@@ -1,5 +1,5 @@
 from collections import UserDict
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import Http404
 from .util import get_entry, list_entries, save_entry
 from .forms import EntryForm, EditEntryForm, UserRegistrationForm
@@ -11,35 +11,28 @@ from .models import UserProfile, Entry
 from django.contrib.auth.models import User
 
 def index(request):
-    entries = Entry.objects.all()  # Fetch all entries from the database
-    return render(request, 'index.html', {'entries': entries})
+    return render(request, "encyclopedia/index.html", {
+        "entries": list_entries()
+    })
 
 def entry_page(request, title):
-    # Retrieve the contents of the entry with the provided title
-    entry_content = get_entry(title)
-
-    # Check if the entry exists
-
-    if entry_content is None:
-        return render(request, "not_found.html", {"title": title})
-    html_content = markdown2.markdown(entry_content)
-    return render(request, "entry.html", {"title": title, "entry_content": html_content})
-    # Render the entry page template with the entry content
+    # Retrieve the entry object from the database or return a 404 error if not found
+    entry = get_object_or_404(Entry, title=title)
+    
+    # Optionally, you can retrieve the entry content and convert it to HTML using markdown2
+    # html_content = markdown2.markdown(entry.content)
+    
+    # Pass the entry object to the template for rendering
+    return render(request, "entry.html", {"entry": entry})
 
 def search(request):
     query = request.GET.get('q')
-    entries = list_entries()
+    matching_entries = Entry.objects.filter(title__icontains=query)
 
-    # Check if the query matches the name of an encyclopedia entry
-    matching_entries = [entry for entry in entries if query.lower() in entry.lower()]
-
-    if matching_entries:
-        # If there are matching entries, redirect to the first matching entry page
-        return redirect('entry_page', title=matching_entries[0])
+    if matching_entries.exists():
+        return redirect('entry_page', title=matching_entries.first().title)
     else:
-        # If there are no matching entries, display search results page
-        search_results = [entry for entry in entries if query.lower() in entry.lower()]
-        return render(request, 'search_results.html', {'query': query, 'search_results': search_results})
+        return render(request, 'search_results.html', {'query': query, 'search_results': matching_entries})
 
 def create_new_page(request):
     if request.method == "POST":
@@ -47,32 +40,29 @@ def create_new_page(request):
         if form.is_valid():
             title = form.cleaned_data["title"]
             content = form.cleaned_data["content"]
-            existing_entries = list_entries()
-            if title.lower() in [entry.lower() for entry in existing_entries]:
+            if Entry.objects.filter(title__iexact=title).exists():
                 messages.error(request, f"An entry with the title '{title}' already exists.")
             else:
                 save_entry(title, content)  # Save the new entry
-            return redirect("entry_page", title=title)  # Redirect to the newly created entry page
+                return redirect("entry_page", title=title)  # Redirect to the newly created entry page
     else:
         form = EntryForm()
 
     return render(request, "create_new_page.html", {"form": form})
 
 def random_page(request):
-    entries = list_entries()
-    random_entry = random.choice(entries)
-    return redirect('entry_page', title=random_entry)
+    random_entry = Entry.objects.order_by('?').first()
+    return redirect('entry_page', title=random_entry.title)
 
 def edit_page(request, title):
-    content = get_entry(title)
+    entry = Entry.objects.get(title=title)
     if request.method == "POST":
-        form = EditEntryForm(request.POST)
+        form = EditEntryForm(request.POST, request.FILES, instance=entry)
         if form.is_valid():
-            new_content = form.cleaned_data["content"]
-            save_entry(title, new_content)
+            form.save()
             return redirect('entry_page', title=title)
     else:
-        form = EditEntryForm(initial={"content": content})
+        form = EditEntryForm(instance=entry)
     return render(request, "edit_page.html", {"form": form, "title": title})
 
 def register(request):

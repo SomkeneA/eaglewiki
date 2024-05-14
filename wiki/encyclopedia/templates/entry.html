@@ -7,9 +7,38 @@
 {% endblock %}
 
 {% block body %}
-    <h1>{{ title }}</h1>
+    <h1>{{ entry.title }}</h1>
+    {% if entry.image %}
+    <img src="{{ entry.image.url }}" alt="{{ entry.title }} Image">
+{% else %}
+    <p>No image available</p>
+{% endif %}
+
+{% if entry.content %}
     <div>
-        {{ entry_content | safe }}
+        <p>{{ entry.content }}</p>
     </div>
-    <a href="{% url 'edit_page' title=title %}">Edit Page</a> <!-- Add this line -->
+{% endif %}
+
+{% if entry.category %}
+    <div>
+        <h6>Category</h6>
+        <p>{{ entry.category }}</p>
+    </div>
+{% endif %}
+
+{% if entry.tag %}
+    <div>
+        <h2>Tag</h2>
+        <p>{{ entry.tag }}</p>
+    </div>
+{% endif %}
+
+{% if entry.reference %}
+    <div>
+        <h2>Reference</h2>
+        <p>{{ entry.reference }}</p>
+    </div>
+{% endif %}
+    <a href="{% url 'edit_page' title=entry.title %}">Edit Page</a> <!-- Add this line -->
 {% endblock %}
