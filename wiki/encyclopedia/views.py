@@ -6,14 +6,15 @@ from .forms import EntryForm, EditEntryForm, UserRegistrationForm
 import random
 from django.contrib import messages
 from . import util
-import markdown2
 from .models import UserProfile, Entry
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+import logging
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
         "entries": list_entries()
-    })
+    })  
 
 def entry_page(request, title):
     # Retrieve the entry object from the database or return a 404 error if not found
@@ -25,15 +26,50 @@ def entry_page(request, title):
     # Pass the entry object to the template for rendering
     return render(request, "entry.html", {"entry": entry})
 
+#def search(request):
+   # query = request.GET.get('q')
+    #matching_entries = Entry.objects.filter(title__icontains=query)
+
+    #if matching_entries.exists():
+      #  return redirect('entry_page', title=matching_entries.first().title)
+    #else:
+      #  return render(request, 'search_results.html', {'query': query, 'search_results': matching_entries})
+logger = logging.getLogger(__name__)   
+
 def search(request):
     query = request.GET.get('q')
-    matching_entries = Entry.objects.filter(title__icontains=query)
+    
+    if not query:
+        return render(request, 'encyclopedia/no_results.html', {'query': query})
 
-    if matching_entries.exists():
-        return redirect('entry_page', title=matching_entries.first().title)
-    else:
-        return render(request, 'search_results.html', {'query': query, 'search_results': matching_entries})
+    try:
+        matching_entries = Entry.objects.filter(title__icontains=query)
 
+        if matching_entries.exists():
+            # If only one matching entry exists, redirect to that entry's page
+            if matching_entries.count() == 1:
+                return redirect('entry_page', title=matching_entries.first().title)
+            # If multiple matching entries exist, render the search results page
+            else:
+                return render(request, 'encyclopedia/search_results.html', {
+                    'query': query,
+                    'search_results': matching_entries
+                })
+        else:
+            # If no matching entries exist, render the no results page
+            return render(request, 'encyclopedia/no_results.html', {
+                'query': query
+            })
+    except Exception as e:
+        # Log the error
+        logger.error(f"Error during search for query '{query}': {e}")
+        # Render a generic error page or redirect to a safe page
+        return render(request, 'encyclopedia/no_results.html', {
+            'query': query,
+            'error_message': 'An error occurred during the search. Please try again.'
+        })
+    
+@login_required
 def create_new_page(request):
     if request.method == "POST":
         form = EntryForm(request.POST)
@@ -54,6 +90,7 @@ def random_page(request):
     random_entry = Entry.objects.order_by('?').first()
     return redirect('entry_page', title=random_entry.title)
 
+@login_required
 def edit_page(request, title):
     entry = Entry.objects.get(title=title)
     if request.method == "POST":
@@ -76,11 +113,14 @@ def register(request):
         form = UserRegistrationForm()
     return render(request, 'registration/register.html', {'form': form})
 
-
 def profile(request):
     # Retrieve the UserProfile associated with the current user
-    custom_user = User.objects.get(id=request.user.id)
-    user_profile = UserProfile.objects.get(user=custom_user)
+    try:
+        user_profile = UserProfile.objects.get(user=request.user)
+    except UserProfile.DoesNotExist:
+
+    # Create a new UserProfile if it doesn't exist
+        user_profile = UserProfile.objects.create(user=request.user)
     context = {
         'user_profile': user_profile
     }

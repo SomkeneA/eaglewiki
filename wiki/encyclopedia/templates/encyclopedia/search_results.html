@@ -1,0 +1,21 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+Search Results
+{% endblock %}
+
+{% block body %}
+    <h1>Search Results</h1>
+    {% if results %}
+        <ul>
+            {% for result in results %}
+                <li><a href="{% url 'entry_page' result %}">{{ result }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No results found for "{{ query }}".</p>
+        <p> To be part of this project, you may want to create a new entry about events, places, people,<br>
+            and things related to Nigeria and the Nigerian people.</p>
+        <a href="{% url 'create_new_page' %}">Create a new page</a>
+    {% endif %}
+{% endblock %}
