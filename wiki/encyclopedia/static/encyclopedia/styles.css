@@ -2,6 +2,25 @@ body {
     margin: 0;
     background-color: white;
 }
+.header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 80px;
+    border-radius: 6px;
+    background-color: #014607;
+    display: flex;
+    align-content: center;
+    justify-content: space-between;
+    z-index: 1000;
+}
+
+.entry_list{
+    margin-top: 80px;
+}
+.entry_list ul li {
+    margin-bottom: 12px;
+}
 
 code {
     white-space: pre;
@@ -10,8 +29,14 @@ code {
 h1 {
     margin-top: 0px;
     padding-top: 20px;
+    padding-bottom: 20px;
+    color: white;
+    padding-left: 8px;
 }
 
+.entry_title {
+    color: black;
+}
 textarea {
     height: 90vh;
     width: 80%;
@@ -25,14 +50,58 @@ textarea {
     width: 100%;
     font-size: 15px;
     line-height: 15px;
+    border-radius: 15px;
+    padding: 10px;
+    border: 1px solid #ccc; /* Light border for a flat appearance */
+    outline: none;
+    box-shadow: none;
+    margin-bottom: 20px;
+}
+
+/* Optional: Add focus and hover effects for better visual feedback */
+.search:focus {
+    border-color: #014607; /* Change border color when focused */
+    box-shadow: none; /* Ensure no shadow is applied */
+}
+
+.search::placeholder {
+    color: #999; /* Optional: change placeholder text color */
+}
+
+.button-class {
+    border-radius: 15px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    background-color: #014607;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+}
+
+/* Remove shadow effects if any */
+.button-class:focus, .button-class:active {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Optional: Add hover effect for better visual feedback */
+.button-class:hover {
+    background-color: #012f04;
 }
 
 .sidebar {
-    background-color: #f0f0f0;
-    height: 100vh;
+    background-color:#e6e6e6;
+    height: 1000vh;
     padding: 20px;
 }
 
 .sidebar h2 {
     margin-top: 5px;
+    color: #014607;
 }

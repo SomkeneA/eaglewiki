@@ -5,12 +5,19 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Eaglewiki</h1>
 
+<div class="header">
+    <h1>Eaglewiki</h1>
+</div>
+
+<div class="entry_list">
     <ul>
         {% for entry in entries %}
-    <li><a href="{% url 'entry_page' entry %}">{{ entry.title }}</a></li>
+    <li><a href="{% url 'entry_page' entry.title %}"> {% if entry.thumbnail %}
+        <img class="thumbnail" src="{{ entry.thumbnail.url }}" alt="{{ entry }} thumbnail" style="width:70px;height:70px;border-radius: 10px;">
+    {% endif %}
+    {{ entry.title }}</a></li>
         {% endfor %}
     </ul>
-
+</div>
 {% endblock %}

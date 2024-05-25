@@ -7,7 +7,8 @@
 {% endblock %}
 
 {% block body %}
-    <h1>{{ entry.title }}</h1>
+    <h1 class="entry_title">{{ entry.title }}</h1>
+    <div class="main-content">
     {% if entry.image %}
     <img src="{{ entry.image.url }}" alt="{{ entry.title }} Image">
 {% else %}
@@ -15,7 +16,7 @@
 {% endif %}
 
 {% if entry.content %}
-    <div>
+    
         <p>{{ entry.content }}</p>
     </div>
 {% endif %}

@@ -12,9 +12,10 @@ from django.contrib.auth.decorators import login_required
 import logging
 
 def index(request):
+    entries = list_entries()
     return render(request, "encyclopedia/index.html", {
-        "entries": list_entries()
-    })  
+        "entries": entries
+    }) 
 
 def entry_page(request, title):
     # Retrieve the entry object from the database or return a 404 error if not found
