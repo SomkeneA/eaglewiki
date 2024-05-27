@@ -10,6 +10,7 @@ from .models import UserProfile, Entry
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 import logging
+from markdown2 import markdown
 
 def index(request):
     entries = list_entries()
@@ -27,14 +28,6 @@ def entry_page(request, title):
     # Pass the entry object to the template for rendering
     return render(request, "entry.html", {"entry": entry})
 
-#def search(request):
-   # query = request.GET.get('q')
-    #matching_entries = Entry.objects.filter(title__icontains=query)
-
-    #if matching_entries.exists():
-      #  return redirect('entry_page', title=matching_entries.first().title)
-    #else:
-      #  return render(request, 'search_results.html', {'query': query, 'search_results': matching_entries})
 logger = logging.getLogger(__name__)   
 
 def search(request):
@@ -73,15 +66,23 @@ def search(request):
 @login_required
 def create_new_page(request):
     if request.method == "POST":
-        form = EntryForm(request.POST)
+        form = EntryForm(request.POST, request.FILES)
         if form.is_valid():
             title = form.cleaned_data["title"]
             content = form.cleaned_data["content"]
+            image = form.cleaned_data.get("image")
+            category = form.cleaned_data.get("category")
+            tag = form.cleaned_data.get("tag")
+            reference = form.cleaned_data.get("reference")
+            
             if Entry.objects.filter(title__iexact=title).exists():
                 messages.error(request, f"An entry with the title '{title}' already exists.")
             else:
-                save_entry(title, content)  # Save the new entry
-                return redirect("entry_page", title=title)  # Redirect to the newly created entry page
+                # Convert markdown to HTML before saving
+                content_html = markdown(content)
+                entry = Entry(title=title, content=content_html, image=image, category=category, tag=tag, reference=reference)
+                entry.save()
+                return redirect("entry_page", title=title)
     else:
         form = EntryForm()
 
@@ -93,10 +94,13 @@ def random_page(request):
 
 @login_required
 def edit_page(request, title):
-    entry = Entry.objects.get(title=title)
+    entry = get_object_or_404(Entry, title=title)
     if request.method == "POST":
         form = EditEntryForm(request.POST, request.FILES, instance=entry)
         if form.is_valid():
+            content = form.cleaned_data["content"]
+            # Convert markdown to HTML before saving
+            entry.content = markdown(content)
             form.save()
             return redirect('entry_page', title=title)
     else:

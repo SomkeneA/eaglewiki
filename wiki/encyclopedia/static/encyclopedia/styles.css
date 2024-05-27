@@ -15,11 +15,26 @@ body {
     z-index: 1000;
 }
 
-.entry_list{
+.entry_list {
     margin-top: 80px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px; /* Adjust the gap between items */
 }
+
+.entry_list ul {
+    list-style: none; /* Remove default list styling */
+    padding: 0;
+    margin: 0;
+    display: contents; /* To allow li elements to be children of grid */
+}
+
 .entry_list ul li {
     margin-bottom: 12px;
+    padding: 10px;
+    background-color: #f4f4f4; /* Optional: background color for better visibility */
+    border-radius: 5px; /* Optional: rounded corners */
+    text-align: center; /* Optional: center-align text */
 }
 
 code {
@@ -46,6 +61,34 @@ textarea {
     padding: 10px;
 }
 
+.main-content {
+    overflow: hidden; /* Ensure the container expands to contain floated elements */
+}
+
+.main-content .main-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 10px;
+    margin: 0 20px 20px 0; /* Right and bottom margins */
+    float: left; /* Float the image to the left */
+    object-fit: cover; /* Ensures the image covers the container while maintaining aspect ratio */
+}
+
+/* Ensure there is space between paragraphs */
+.main-content p {
+    margin-bottom: 16px; /* Adjust as needed */
+}
+
+/* Ensure there is space above and below headings */
+.main-content h1,
+.main-content h2,
+.main-content h3,
+.main-content h4,
+.main-content h5,
+.main-content h6 {
+    margin-top: 24px;  /* Space above the heading */
+    margin-bottom: 16px;  /* Space below the heading */
+}
 .search {
     width: 100%;
     font-size: 15px;
@@ -104,4 +147,21 @@ textarea {
 .sidebar h2 {
     margin-top: 5px;
     color: #014607;
+}
+
+.thumbnail {
+    width: 70px;
+    height: 70px;
+    border-radius: 10px;
+    object-fit: cover; /* Ensures the image maintains its aspect ratio and covers the area */
+    display: block; /* Ensures the image is displayed as a block-level element */
+}
+
+.meta-info p {
+    margin-top: 10px;
+}
+
+.meta-info ul {
+    padding-left: 20px;
+    list-style-type: disc;
 }

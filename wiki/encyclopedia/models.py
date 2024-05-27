@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.urls import reverse
 from PIL import Image
 from django.contrib.auth.models import User
 import os
@@ -22,36 +23,44 @@ class Entry(models.Model):
 
     def __str__(self):
         return self.title
-    
+
     def save(self, *args, **kwargs):
+        # Save the entry to generate the image file path if it doesn't exist
         super().save(*args, **kwargs)
         if self.image:
             self.generate_thumbnail()
 
     def generate_thumbnail(self):
-        if self.image and not self.thumbnail:
-            image = Image.open(self.image.path)
-            image.thumbnail((200, 200), Image.LANCZOS)  # Use LANCZOS instead of ANTIALIAS
-            thumbnail_name, thumbnail_extension = os.path.splitext(self.image.name)
-            thumbnail_extension = thumbnail_extension.lower()
+        if not self.image:
+            return
 
-            thumbnail_filename = thumbnail_name + '_thumb' + thumbnail_extension
-            thumbnail_path = os.path.join('thumbnails/', thumbnail_filename)
+        image = Image.open(self.image.path)
+        image.thumbnail((200, 200), Image.LANCZOS)
 
-            # Ensure the directory exists
-            thumbnail_full_path = os.path.join(settings.MEDIA_ROOT, thumbnail_path)
-            os.makedirs(os.path.dirname(thumbnail_full_path), exist_ok=True)
+        thumbnail_name, thumbnail_extension = os.path.splitext(self.image.name)
+        thumbnail_extension = thumbnail_extension.lower()
 
-            if thumbnail_extension in ['.jpg', '.jpeg']:
-                filetype = 'JPEG'
-            elif thumbnail_extension == '.gif':
-                filetype = 'GIF'
-            elif thumbnail_extension == '.png':
-                filetype = 'PNG'
-            else:
-                return
+        thumbnail_filename = thumbnail_name + '_thumb' + thumbnail_extension
+        thumbnail_path = os.path.join('thumbnails/', thumbnail_filename)
 
-            # Save the thumbnail
-            image.save(thumbnail_full_path, filetype)
-            self.thumbnail = thumbnail_path
-            super().save(update_fields=['thumbnail'])
+        # Ensure the directory exists
+        thumbnail_full_path = os.path.join(settings.MEDIA_ROOT, thumbnail_path)
+        os.makedirs(os.path.dirname(thumbnail_full_path), exist_ok=True)
+
+        if thumbnail_extension in ['.jpg', '.jpeg']:
+            filetype = 'JPEG'
+        elif thumbnail_extension == '.gif':
+            filetype = 'GIF'
+        elif thumbnail_extension == '.png':
+            filetype = 'PNG'
+        else:
+            return
+
+        # Save the thumbnail
+        image.save(thumbnail_full_path, filetype)
+        self.thumbnail = thumbnail_path
+        # Save the entry again to update the thumbnail path
+        super().save(update_fields=['thumbnail'])
+
+    def get_absolute_url(self):
+        return reverse('entry_page', args=[str(self.title)])

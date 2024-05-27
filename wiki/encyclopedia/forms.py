@@ -11,13 +11,27 @@ class EntryForm(forms.Form):
     tag = forms.CharField(label="Tag", max_length=100, required=False)
     reference = forms.CharField(label="Reference", max_length=255, required=False)
 
+    widgets = {
+            'categories': forms.CheckboxSelectMultiple,
+            'tags': forms.CheckboxSelectMultiple,
+            'references': forms.CheckboxSelectMultiple,
+        }
+
 class EditEntryForm(forms.ModelForm):
     class Meta:
         model = Entry
         fields = ['content', 'image', 'category', 'tag', 'reference']
+
+        widgets = {
+            'categories': forms.CheckboxSelectMultiple,
+            'tags': forms.CheckboxSelectMultiple,
+            'references': forms.CheckboxSelectMultiple,
+        }
 
 
 class UserRegistrationForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'email']
+
+        
