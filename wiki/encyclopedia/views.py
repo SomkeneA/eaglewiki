@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 import logging
 from markdown2 import markdown
+from .util import link_references
 
 def index(request):
     entries = list_entries()
@@ -78,15 +79,14 @@ def create_new_page(request):
             if Entry.objects.filter(title__iexact=title).exists():
                 messages.error(request, f"An entry with the title '{title}' already exists.")
             else:
-                # Convert markdown to HTML before saving
                 content_html = markdown(content)
+                content_html = link_references(content_html)
                 entry = Entry(title=title, content=content_html, image=image, category=category, tag=tag, reference=reference)
                 entry.save()
                 return redirect("entry_page", title=title)
     else:
         form = EntryForm()
-
-    return render(request, "create_new_page.html", {"form": form})
+    return render(request, "encyclopedia/create_new_page.html", {"form": form})
 
 def random_page(request):
     random_entry = Entry.objects.order_by('?').first()
@@ -99,13 +99,13 @@ def edit_page(request, title):
         form = EditEntryForm(request.POST, request.FILES, instance=entry)
         if form.is_valid():
             content = form.cleaned_data["content"]
-            # Convert markdown to HTML before saving
             entry.content = markdown(content)
+            entry.content = link_references(entry.content)
             form.save()
             return redirect('entry_page', title=title)
     else:
         form = EditEntryForm(instance=entry)
-    return render(request, "edit_page.html", {"form": form, "title": title})
+    return render(request, "encyclopedia/edit_page.html", {"form": form, "title": title})
 
 def register(request):
     if request.method == 'POST':
