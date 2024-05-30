@@ -16,20 +16,46 @@ body {
 }
 
 .entry_list {
+    max-width: 100%;
     margin-top: 80px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px; /* Adjust the gap between items */
 }
 
-.entry_list ul {
+.entry_list .list {
     list-style: none; /* Remove default list styling */
+    padding-block: 10px;
     padding: 0;
     margin: 0;
-    display: contents; /* To allow li elements to be children of grid */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Adjust the gap between items */
 }
 
-.entry_list ul li {
+.entry_list[data-animated="true"] {
+    overflow: hidden;
+    -webkit-mask: linear-gradient(90deg, transparent, white, 20%, white 80%, transparent);
+    mask: linear-gradient(90deg, transparent, white, 20%, white 80%, transparent);
+}
+
+.entry_list[data-animated="true"] .list {
+    width: max-content;
+    flex-wrap: nowrap;
+    animation: scroll 
+    var(--_animation-duration, 120s) 
+    var(--_animation-direction, forwards)
+    linear 
+    infinite;
+}
+
+.entry_list[data-direction="right"] {
+    --_animation-direction:  reverse;
+}
+@keyframes scroll {
+    to {
+        transform: translateX(calc(-50% - 5px));
+    }
+}
+
+.entry_list .list li {
     margin-bottom: 12px;
     padding: 10px;
     background-color: #f4f4f4; /* Optional: background color for better visibility */
@@ -76,7 +102,7 @@ textarea {
 
 /* Ensure there is space between paragraphs */
 .main-content p {
-    margin-bottom: 16px; /* Adjust as needed */
+    margin-bottom: 16px; 
 }
 
 /* Ensure there is space above and below headings */

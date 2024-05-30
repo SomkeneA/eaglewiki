@@ -12,13 +12,17 @@
 </div>
 
 <div class="entry_list">
-    <ul>
+    <ul class="list">
         {% for entry in entries %}
-    <li><a href="{% url 'entry_page' entry.title %}"> {% if entry.thumbnail %}
-        <img class="thumbnail" src="{{ entry.thumbnail.url }}" alt="{{ entry }} thumbnail">
-    {% endif %}
-    {{ entry.title }}</a></li>
+            <li><a href="{% url 'entry_page' entry.title %}">
+                {% if entry.thumbnail %}
+                    <img class="thumbnail" src="{{ entry.thumbnail.url }}" alt="{{ entry }} thumbnail">
+                {% endif %}
+                {{ entry.title }}
+            </a></li>
         {% endfor %}
     </ul>
 </div>
+
+<script src="{% static 'encyclopedia/infinite_scroll.js' %}"></script>
 {% endblock %}
