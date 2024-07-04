@@ -30,11 +30,8 @@ def get_entry(title):
     except Entry.DoesNotExist:
         return None
     
-def link_references(content):
-    # Fetch all entry titles to create links
-    entries = Entry.objects.values_list('title', flat=True)
-    for entry in entries:
-        pattern = re.compile(rf'\b({re.escape(entry)})\b', re.IGNORECASE)
-        url = reverse('entry_page', args=[entry])
-        content = pattern.sub(f'<a href="{url}">\\1</a>', content)
-    return content
+def convert_references_to_links(content):
+    def replace_reference(match):
+        title = match.group(1)
+        return f'[{title}](/wiki/{title})'
+    return re.sub(r'\[\[([^\]]+)\]\]', replace_reference, content)

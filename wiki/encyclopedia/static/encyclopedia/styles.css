@@ -1,3 +1,15 @@
+p {
+    font-family: 'roboto';
+    font-size: 1rem;
+    line-height: 1.2;
+}
+a {
+    font-size:  1rem;
+    line-height: 1.2;
+    color:#014607;
+    font-family: 'roboto';
+    cursor: pointer;
+}
 body {
     margin: 0;
     background-color: white;
@@ -15,6 +27,14 @@ body {
     z-index: 1000;
 }
 
+.row {
+    width: 1200px;
+    margin: 0 auto;
+}
+
+.entry_edit{
+    font-size: xx-small;
+}
 .entry_list {
     max-width: 100%;
     margin-top: 80px;
@@ -68,13 +88,17 @@ code {
 }
 
 h1 {
+    font-size: 2.5rem;
     margin-top: 0px;
     padding-top: 20px;
     padding-bottom: 20px;
     color: white;
     padding-left: 8px;
 }
-
+h2 {
+    font-size: 2rem;
+    padding-bottom: 15px;
+}
 .entry_title {
     color: black;
 }
@@ -84,25 +108,70 @@ textarea {
 }
 
 .main {
+    margin-left: 220px; /* Ensure main content is not hidden behind the sidebar */
     padding: 10px;
 }
-
 .main-content {
-    overflow: hidden; /* Ensure the container expands to contain floated elements */
+    overflow:hidden; /* Ensure the container expands to contain floated elements */
+    justify-items: center;
+    text-align: justify;
 }
 
-.main-content .main-image {
+.main-content li {
+    font-family:'roboto' ;
+    list-style-type: disc;
+}
+
+.main-image {
     width: 200px;
     height: 200px;
     border-radius: 10px;
     margin: 0 20px 20px 0; /* Right and bottom margins */
-    float: left; /* Float the image to the left */
+    float: left;/* Float the image to the left */
     object-fit: cover; /* Ensures the image covers the container while maintaining aspect ratio */
+    display: block;
+}
+.image_bio_box {
+    float: right; /* Float the image and bio box to the left */
+    max-width: 220px; /* Adjust max-width as needed */
+    margin-left: 30px; /* Space to the right of the image_bio_box */
+    margin-bottom: 10px;
+}
+.bio_box {
+    max-width: 200px;
+    margin-top: 10px; /* Add some space above the bio box */
+}
+
+.bio_content {
+    max-width: 100%;
+    word-wrap: break-word; /* Ensure text wraps appropriately */
 }
 
 /* Ensure there is space between paragraphs */
 .main-content p {
-    margin-bottom: 16px; 
+    margin-top: 0;
+    margin-bottom: 16px; /* Add space between paragraphs */
+    line-height: 1.6; /* Improve readability */
+}
+
+.main-content strong {
+    font-weight: bold;
+}
+
+.main-content h4 {
+    margin-bottom: 16px;
+    font-size: 1.6rem; 
+
+}
+.main-content h5 {
+    margin-bottom: 16px;
+    font-size: 1.4rem; 
+
+}
+
+.main-content a {
+    margin-bottom: 16px;
+    color: #01990e; 
 }
 
 /* Ensure there is space above and below headings */
@@ -114,9 +183,11 @@ textarea {
 .main-content h6 {
     margin-top: 24px;  /* Space above the heading */
     margin-bottom: 16px;  /* Space below the heading */
+    font-weight: bold;
+    color: #014607;
 }
 .search {
-    width: 100%;
+    width: 85%;
     font-size: 15px;
     line-height: 15px;
     border-radius: 15px;
@@ -125,6 +196,7 @@ textarea {
     outline: none;
     box-shadow: none;
     margin-bottom: 20px;
+    background-color: white;
 }
 
 /* Optional: Add focus and hover effects for better visual feedback */
@@ -161,13 +233,20 @@ textarea {
 
 /* Optional: Add hover effect for better visual feedback */
 .button-class:hover {
-    background-color: #012f04;
+    background-color: #017709;
 }
 
 .sidebar {
-    background-color:#e6e6e6;
-    height: 1000vh;
-    padding: 20px;
+    background-color: #e6e6e6;
+    padding: 25px;
+    height: 100vh; /* Full viewport height */
+    position: fixed; /* Make the sidebar fixed to the left */
+    top: 0;
+    left: 0;
+    width: 100%; /* Full width for small screens */
+    max-width: 250px; /* Adjust the max width as needed */
+    overflow-y: auto; /* Add vertical scrolling if content overflows */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
 }
 
 .sidebar h2 {
@@ -190,4 +269,240 @@ textarea {
 .meta-info ul {
     padding-left: 20px;
     list-style-type: disc;
+}
+
+.trends {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.trends .box {
+    flex: 1 1 calc(25% - 20px); /* Adjust width to fit 4 boxes per row */
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.trends .box h6 {
+    margin-top: 0;
+    font-size: 1.2em; /* Adjust font size for heading */
+}
+
+.trends .box img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 10px auto; /* Center the image horizontally */
+}
+
+.trends .box p {
+    margin-top: 10px;
+    font-size: 0.9em; /* Adjust font size for paragraph */
+    color: #555; /* Optional: color for the text */
+}
+
+.page_form {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.page_title {
+    justify-content: center;
+    width: 100%;
+}
+.page_title h1 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+.page_title h2 {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.register_form, .login_form {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.page_form input[type="text"],
+.page_form input[type="password"],
+.page_form input[type="email"],
+.page_form textarea,
+.register_form input[type="text"],
+.register_form input[type="password"],
+.register_form input[type="email"],
+.login_form input[type="text"],
+.login_form input[type="password"] {
+    width: calc(100% - 22px); /* Adjust width for padding */
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.page_form button.button-class,
+.register_form button.button-class,
+.login_form button.button-class {
+    width: 100%;
+    padding: 10px;
+    background-color: #014607;
+    border: none;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.page_form button.button-class:hover,
+.register_form button.button-class:hover,
+.login_form button.button-class:hover {
+    background-color: #012f04;
+}
+
+.page_form .errorlist, .register_form .errorlist, .login_form .errorlist {
+    color: red;
+    margin-bottom: 15px;
+}
+
+/* Optional: Add hover effect for better visual feedback */
+a {
+    color: #014607;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.page_form .helptext, .register_form .helptext, .login_form .helptext {
+    font-size: 12px;
+    color: #888;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+
+.page_form .password_rules, .register_form .password_rules, .login_form .password_rules {
+    font-size: 12px;
+    color: #888;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+
+.quote_of_day {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: #017709;
+}
+
+.quote_of_day strong {
+  font-family: "Luxurious Script", cursive;
+  font-size: 50px;
+  font-style: normal;
+  margin-top: 50px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #f9f9f9;
+}
+
+.quote_of_day p{
+    font-size: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.mkdwn_image{
+    max-width: 20%;
+    height: auto;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin:15px 15px 0; ;
+    flex-wrap: wrap;
+    float: right;
+
+}
+
+.bio_content table {
+    width: 200px;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 14px;
+    text-align: left;
+}
+
+.main-content th, .main-content td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+
+}
+
+.main-content th {
+    background-color: #f4f4f4;
+}
+
+form {
+    margin: 20px 0;
+}
+
+form label {
+    display: block;
+    margin: 10px 0 5px;
+}
+
+form input, form select, form textarea {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+form button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #45a049;
+}
+
+form .checkbox-select-multiple {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Adjust gap between checkboxes */
+}
+
+form .checkbox-select-multiple label {
+    width: auto;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+}
+
+form .checkbox-select-multiple input[type="checkbox"] {
+    margin-right: 5px; /* Space between checkbox and label */
 }

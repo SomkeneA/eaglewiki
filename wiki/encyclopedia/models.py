@@ -11,15 +11,38 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     # Add other fields as needed
 
+class Tag(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+    
 
 class Entry(models.Model):
+
+    CATEGORY_CHOICES = [
+        ('people & organization', 'People & Organization'),
+        ('person', 'Person'),
+        ('event', 'Event'),
+        ('entertainment', 'Entertainment'),
+        ('place & geography', 'Place & Geography'),
+        ('technology & innovation', 'Technology & Innovation'),
+        ('religion & culture', 'Religion & Culture'),
+        ('food & agriculture', 'Food & Agriculture'),
+        ('name', 'Name'),
+        ('language', 'Language'),
+        ('education', 'Education'),
+        ('book', 'Book')
+    ]
+
     title = models.CharField(max_length=255)
     content = models.TextField()
     image = models.ImageField(upload_to='images/', null=True, blank=True)
     thumbnail = models.ImageField(upload_to='thumbnails/', blank=True, null=True)
-    category = models.CharField(max_length=100, null=True, blank=True)
-    tag = models.CharField(max_length=100, null=True, blank=True)
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    tag = models.ManyToManyField(Tag, blank=True)
     reference = models.CharField(max_length=255, null=True, blank=True)
+    bio_content = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.title

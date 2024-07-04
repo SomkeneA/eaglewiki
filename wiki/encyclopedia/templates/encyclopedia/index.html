@@ -24,5 +24,49 @@
     </ul>
 </div>
 
+<!-- New "quote of the day" section below -->
+<div class= "quote_of_day">
+    <strong> Quote Of The Day<strong>
+        <p>We cannot trample upon the humanity of others without devaluing our own. 
+            <br>The Igbo, always practical, put it concretely in their proverb Onye ji onye n'ani ji onwe ya: 
+            <br>'He who will hold another down in the mud must stay in the mud to keep him down.'
+            <br> ~ Chinua Achebe</p>
+</div>
+<!-- New "some contents" section below the entry list -->
+<div class="trends">
+    <div class="box">
+        <h5> Article of the day</h5>
+        <h6>{{ article_of_the_day.title }}</h6>
+        {% if article_of_the_day.thumbnail %}
+            <img src="{{ article_of_the_day.thumbnail.url }}" alt="{{ article_of_the_day.title }} thumbnail">
+        {% endif %}
+        <p>{{ article_of_the_day.content|safe|truncatewords:30 }}</p>
+    </div>
+    <div class="box">
+        <h5>Citizen of the day</h5>
+        <h6>{{ citizen_of_the_day.title }}</h6>
+        {% if citizen_of_the_day.thumbnail %}
+            <img src="{{ citizen_of_the_day.thumbnail.url }}" alt="{{ citizen_of_the_day.title }} thumbnail">
+        {% endif %}
+        <p>{{ citizen_of_the_day.content|safe|truncatewords:30 }}</p>
+    </div>
+    <div class="box">
+        <h5>On this day</h5>
+        <h6>{{ on_this_day.title }}</h6>
+        {% if on_this_day.thumbnail %}
+            <img src="{{ on_this_day.thumbnail.url }}" alt="{{ on_this_day.title }} thumbnail">
+        {% endif %}
+        <p>{{ on_this_day.content|safe|truncatewords:30 }}</p>
+    </div>
+    <div class="box">
+        <h5>Story of the day</h5>
+        <h6>{{ story_of_the_day.title }}</h6>
+        {% if story_of_the_day.thumbnail %}
+            <img src="{{ story_of_the_day.thumbnail.url }}" alt="{{ story_of_the_day.title }} thumbnail">
+        {% endif %}
+        <p>{{ story_of_the_day.content|safe|truncatewords:30 }}</p>
+    </div>
+</div>
+
 <script src="{% static 'encyclopedia/infinite_scroll.js' %}"></script>
 {% endblock %}

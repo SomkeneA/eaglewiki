@@ -1,14 +1,28 @@
 <!-- templates/registration/register.html -->
 
 {% extends 'encyclopedia/layout.html' %}
-{% block body %}
-<h2>Register</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-<button type="submit">Register</button>
+{% load static %}
 
-        </form>
+{% block body %}
+<div class= "page_title">
+<h2>Register</h2>
+</div>
+<form class="register_form" method="post">
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="form-group">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.help_text %}
+                <small class="helptext">{{ field.help_text }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+                <div class="password_rules">{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+    <button class="button-class" type="submit">Register</button>
+</form>
         <p>Already have an account? <a href="{% url 'login' %}">Log in</a></p>
        
 {% endblock %}

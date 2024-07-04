@@ -1,0 +1,10 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block body %}
+<h1>Entries Tagged with "{{ tag.name }}"</h1>
+<ul>
+    {% for entry in entries %}
+        <li><a href="{% url 'entry_page' entry.title %}">{{ entry.title }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

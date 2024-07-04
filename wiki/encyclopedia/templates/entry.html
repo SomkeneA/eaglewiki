@@ -1,5 +1,6 @@
 {% extends "encyclopedia/layout.html" %}
 {% load static%}
+{% load custom_filters %}
 
 {% block title %}
 
@@ -9,16 +10,23 @@
 
 {% block body %}
     <h1 class="entry_title">{{ entry.title }}</h1>
-    <div class="main-content">
+<div class="main-content">
+<div class="image_bio_box">
     {% if entry.image %}
     <img class="main-image" src="{{ entry.image.url }}" alt="{{ entry.title }} Image">
 {% else %}
     <p>No image available</p>
 {% endif %}
 
+<div class="bio_box">
+    <div class="bio_content">
+        {{ entry.bio_content|safe }}
+    </div>
+</div>
+</div>
 {% if entry.content %}
     
-        <p>{{ entry.content |safe }}</p>
+{{ content_with_markdown_safe|safe }}
     </div>
 {% endif %}
 
@@ -29,20 +37,34 @@
     </div>
 {% endif %}
 
-{% if entry.tag %}
+{% if entry.tag.all %}
     <div>
         <h2>Tag</h2>
-        <p>{{ entry.tag }}</p>
+        <ul>
+            {% for tag in entry.tags.all %}
+                <li><a href="{% url 'tag_page' tag.name %}">{{ tag.name }}</a></li>
+            {% endfor %}
+        </ul>
     </div>
 {% endif %}
 
-{% if entry.reference %}
-    <div>
-        <h2>Reference</h2>
-        <p>{{ entry.reference }}</p>
-    </div>
+{% if reference %}
+<h2>Reference</h2>
+<ul>
+    {% for ref in reference %}
+        {% with ref|cut:',' as stripped_ref %}
+            {% if stripped_ref %}
+                {% if stripped_ref|is_external_link %}
+                    <li><a href="{{ stripped_ref }}" target="_blank">{{ stripped_ref }}</a></li>
+                {% else %}
+                    <li><a href="{% url 'entry_page' stripped_ref %}">{{ stripped_ref }}</a></li>
+                {% endif %}
+            {% endif %}
+        {% endwith %}
+    {% endfor %}
+</ul>
 {% endif %}
-    <a href="{% url 'edit_page' title=entry.title %}">Edit Page</a> <!-- Add this line -->
+    <a class= "entry_edit" href="{% url 'edit_page' title=entry.title %}">Edit Page</a> <!-- Add this line -->
 {% endblock %}
 
 

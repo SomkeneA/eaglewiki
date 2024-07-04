@@ -1,14 +1,13 @@
-{% extends "encyclopedia/layout.html" %}
-
-{% block title %}
-   Edit Page: {{ title }}
-{% endblock %}
+{% extends 'encyclopedia/layout.html' %}
+{% load static %}
 
 {% block body %}
-    <h1>Edit Page: {{ title }}</h1>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save Changes</button>
-    </form>
+<div class="page_title">
+    <h1 class='entry_title'>Edit Page: {{ title }}</h1>
+</div>
+<form class="page_form" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="button-class" type="submit">Save Changes</button>
+</form>
 {% endblock %}

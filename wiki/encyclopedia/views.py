@@ -1,39 +1,79 @@
 from collections import UserDict
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import Http404
-from .util import get_entry, list_entries, save_entry
+from .util import convert_references_to_links, get_entry, list_entries, save_entry
 from .forms import EntryForm, EditEntryForm, UserRegistrationForm
 import random
 from django.contrib import messages
 from . import util
-from .models import UserProfile, Entry
+from .models import UserProfile, Entry, Tag
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 import logging
 from markdown2 import markdown
-from .util import link_references
+import markdown2
+import markdown
+from django.utils.safestring import mark_safe
+import re
+from django.urls import reverse
+from django.utils.html import format_html, escape
+
 
 def index(request):
     entries = list_entries()
-    return render(request, "encyclopedia/index.html", {
-        "entries": entries
-    }) 
+    entries = Entry.objects.all()
+
+    # Replace the below with logic to select specific entries
+    article_of_the_day = Entry.objects.first()  # Example, replace with actual logic
+    citizen_of_the_day = Entry.objects.all()[15]  # Example, replace with actual logic
+    on_this_day = Entry.objects.all()[7] # Example, replace with actual logic
+    story_of_the_day = Entry.objects.all()[19]  # Example, replace with actual logic
+
+    return render(request, 'encyclopedia/index.html', {
+        'entries': entries,
+        'article_of_the_day': article_of_the_day,
+        'citizen_of_the_day': citizen_of_the_day,
+        'on_this_day': on_this_day,
+        'story_of_the_day': story_of_the_day,
+    }
+    )
+
+def render_markdown(content):
+    return markdown2.markdown(content, extras=["tables"])
+
+def tag_page(request, tag_name):
+    tag = get_object_or_404(Tag, name=tag_name)
+    entries = Entry.objects.filter(tags=tag)
+    return render(request, "tag_page.html", {
+        "tag": tag,
+        "entries": entries,
+    })
 
 def entry_page(request, title):
-    # Retrieve the entry object from the database or return a 404 error if not found
     entry = get_object_or_404(Entry, title=title)
-    
-    # Optionally, you can retrieve the entry content and convert it to HTML using markdown2
-    # html_content = markdown2.markdown(entry.content)
-    
-    # Pass the entry object to the template for rendering
-    return render(request, "entry.html", {"entry": entry})
-
-logger = logging.getLogger(__name__)   
+    content_with_links = link_references(entry.content)
+    content_with_markdown = markdown2.markdown(content_with_links, extras=["tables", "fenced-code-blocks", "strike", "highlight", "metadata"])
+    content_with_markdown_safe = mark_safe(content_with_markdown)
+    content_with_links = link_references(entry.content)
+    bio_content_with_markdown = markdown2.markdown(entry.bio_content or "", extras=["tables", "fenced-code-blocks", "strike", "highlight", "metadata"])
+    bio_content_with_markdown_safe = mark_safe(bio_content_with_markdown)
+    reference = entry.reference.split(",") if entry.reference else []
+    return render(request, "entry.html", {
+        "entry": entry,
+        "content_with_markdown_safe": content_with_markdown_safe,
+        "bio_content_with_markdown_safe": bio_content_with_markdown_safe,
+        "reference": reference,
+        "tag": entry.tag.all()
+    })
+logger = logging.getLogger(__name__)
 
 def search(request):
     query = request.GET.get('q')
-    
+
+    if query:
+        # Strip leading and trailing whitespace from the query
+        query = query.strip()
+
     if not query:
         return render(request, 'encyclopedia/no_results.html', {'query': query})
 
@@ -64,29 +104,43 @@ def search(request):
             'error_message': 'An error occurred during the search. Please try again.'
         })
     
+
 @login_required
 def create_new_page(request):
     if request.method == "POST":
         form = EntryForm(request.POST, request.FILES)
         if form.is_valid():
-            title = form.cleaned_data["title"]
-            content = form.cleaned_data["content"]
-            image = form.cleaned_data.get("image")
-            category = form.cleaned_data.get("category")
-            tag = form.cleaned_data.get("tag")
-            reference = form.cleaned_data.get("reference")
-            
-            if Entry.objects.filter(title__iexact=title).exists():
-                messages.error(request, f"An entry with the title '{title}' already exists.")
-            else:
-                content_html = markdown(content)
-                content_html = link_references(content_html)
-                entry = Entry(title=title, content=content_html, image=image, category=category, tag=tag, reference=reference)
-                entry.save()
-                return redirect("entry_page", title=title)
+            entry = form.save(commit=False)
+            entry.save()
+            form.save_m2m()
+            return redirect("entry_page", title=entry.title)
     else:
         form = EntryForm()
     return render(request, "encyclopedia/create_new_page.html", {"form": form})
+
+def link_references(content):
+    # Regex patterns for different formats
+    patterns = [
+        re.compile(r'\[\[(.*?)\]\]'),           # [[Some Entry]]
+        re.compile(r'\{\{(.*?)\}\}'),           # {{Some Entry}}
+        re.compile(r'\[(.*?)\]'),               # [Some Entry]
+        re.compile(r'\[(.*?)\]\((.*?)\)'),      # [Some Entry](Some Entry)
+    ]
+
+    def replace_match(match):
+        entry_title = match.group(1).strip()
+
+        try:
+            entry = Entry.objects.get(title__iexact=entry_title)
+            url = reverse('entry_page', args=[entry.title])
+            return format_html('<a href="{}">{}</a>', url, entry_title)
+        except Entry.DoesNotExist:
+            return match.group(0)  # If entry doesn't exist, return original match
+
+    for pattern in patterns:
+        content = pattern.sub(replace_match, content)
+
+    return content
 
 def random_page(request):
     random_entry = Entry.objects.order_by('?').first()
@@ -96,13 +150,12 @@ def random_page(request):
 def edit_page(request, title):
     entry = get_object_or_404(Entry, title=title)
     if request.method == "POST":
-        form = EditEntryForm(request.POST, request.FILES, instance=entry)
-        if form.is_valid():
-            content = form.cleaned_data["content"]
-            entry.content = markdown(content)
-            entry.content = link_references(entry.content)
-            form.save()
-            return redirect('entry_page', title=title)
+         form = EditEntryForm(request.POST, request.FILES, instance=entry)
+         if form.is_valid():
+            entry = form.save(commit=False)
+            form.save_m2m()  # Save the many-to-many data for tags
+            entry.save()
+            return redirect('entry_page', title=entry.title)
     else:
         form = EditEntryForm(instance=entry)
     return render(request, "encyclopedia/edit_page.html", {"form": form, "title": title})
