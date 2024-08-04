@@ -18,7 +18,7 @@
                 {% if entry.thumbnail %}
                     <img class="thumbnail" src="{{ entry.thumbnail.url }}" alt="{{ entry }} thumbnail">
                 {% endif %}
-                {{ entry.title }}
+                {{ entry.title | truncatewords:2 }}
             </a></li>
         {% endfor %}
     </ul>

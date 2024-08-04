@@ -1,5 +1,0 @@
-Alex Otti (born 18 February 1965) is a Nigerian economist, banker, investor, philanthropist, and politician, serving as the current Governor of Abia State in Nigeria.
-
-
-
- In April 2004, he was promoted to the position of deputy general manager, and a year later was appointed executive director, commercial banking. This was followed by a re-designation as the executive director south directorate, where he was responsible for over 140 branches in both the South-South and South Eastern geopolitical zones of the country. In March 2011, he moved from First Bank Nigeria PLC to Diamond Bank as group managing director/ chief executive officer and has led the bank through a major transformation. He worked both in the treasury and financial services unit as well as the corporate banking division. In 1992, he joined Societe Bancaire Nigeria Limited (Merchant Bankers), a subsidiary of Banque SBA Paris where he rose to the position of a senior manager

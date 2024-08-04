@@ -1,17 +1,20 @@
 p {
     font-family: 'roboto';
-    font-size: 1rem;
+    font-size: 1.8rem;
     line-height: 1.2;
 }
 a {
-    font-size:  1rem;
+    font-size:  1.8rem;
     line-height: 1.2;
     color:#014607;
     font-family: 'roboto';
     cursor: pointer;
 }
-body {
+html, body {
+    font-size: 62.5%;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
     margin: 0;
+    padding: 0;
     background-color: white;
 }
 .header {
@@ -81,26 +84,49 @@ body {
     background-color: #f4f4f4; /* Optional: background color for better visibility */
     border-radius: 5px; /* Optional: rounded corners */
     text-align: center; /* Optional: center-align text */
+    font-size: 1.8rem;
 }
-
+.entry_list .list a {
+    font-size: 1.6rem;
+}
 code {
     white-space: pre;
 }
 
 h1 {
-    font-size: 2.5rem;
+    font-size: 2.8rem;
     margin-top: 0px;
     padding-top: 20px;
     padding-bottom: 20px;
     color: white;
     padding-left: 8px;
 }
+
 h2 {
-    font-size: 2rem;
-    padding-bottom: 15px;
+    font-size: 2.5rem;
+    
+}
+h3 {
+    font-size: 2.1rem;
+   
+}
+
+h4 {
+    font-size: 1.8rem;
+    
+}
+h5 {
+    font-size: 1.6rem;
+    
+}
+
+h6 {
+    font-size: 1.4rem;
+   
 }
 .entry_title {
     color: black;
+    margin-left: -2px;
 }
 textarea {
     height: 90vh;
@@ -108,7 +134,7 @@ textarea {
 }
 
 .main {
-    margin-left: 220px; /* Ensure main content is not hidden behind the sidebar */
+    margin-left: 200px; /* Ensure main content is not hidden behind the sidebar */
     padding: 10px;
 }
 .main-content {
@@ -119,7 +145,8 @@ textarea {
 
 .main-content li {
     font-family:'roboto' ;
-    list-style-type: disc;
+    font-size: 1.8rem;
+    list-style: disc; 
 }
 
 .main-image {
@@ -160,12 +187,12 @@ textarea {
 
 .main-content h4 {
     margin-bottom: 16px;
-    font-size: 1.6rem; 
+    font-size: 2.1rem; 
 
 }
 .main-content h5 {
     margin-bottom: 16px;
-    font-size: 1.4rem; 
+    font-size: 1.6rem; 
 
 }
 
@@ -188,7 +215,7 @@ textarea {
 }
 .search {
     width: 85%;
-    font-size: 15px;
+    font-size: 1.8rem;
     line-height: 15px;
     border-radius: 15px;
     padding: 10px;
@@ -293,7 +320,6 @@ textarea {
 
 .trends .box h6 {
     margin-top: 0;
-    font-size: 1.2em; /* Adjust font size for heading */
 }
 
 .trends .box img {
@@ -305,7 +331,6 @@ textarea {
 
 .trends .box p {
     margin-top: 10px;
-    font-size: 0.9em; /* Adjust font size for paragraph */
     color: #555; /* Optional: color for the text */
 }
 
@@ -328,7 +353,6 @@ textarea {
     margin-bottom: 25px;
 }
 .page_title h2 {
-    font-size: 2rem;
     text-align: center;
     margin-bottom: 20px;
 }
@@ -369,7 +393,7 @@ textarea {
     color: white;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 1.5rem;
 }
 
 .page_form button.button-class:hover,
@@ -394,14 +418,14 @@ a:hover {
 }
 
 .page_form .helptext, .register_form .helptext, .login_form .helptext {
-    font-size: 12px;
+    font-size: 1.8rem;
     color: #888;
     margin-top: -10px;
     margin-bottom: 10px;
 }
 
 .page_form .password_rules, .register_form .password_rules, .login_form .password_rules {
-    font-size: 12px;
+    font-size: 1.8rem;
     color: #888;
     margin-top: -10px;
     margin-bottom: 10px;
@@ -416,7 +440,7 @@ a:hover {
 
 .quote_of_day strong {
   font-family: "Luxurious Script", cursive;
-  font-size: 50px;
+  font-size: 5rem;
   font-style: normal;
   margin-top: 50px;
   margin-bottom: 20px;
@@ -425,7 +449,7 @@ a:hover {
 }
 
 .quote_of_day p{
-    font-size: 20px;
+    font-size: 2rem;
     text-align: center;
     margin-bottom: 20px;
 }
@@ -446,14 +470,15 @@ a:hover {
     width: 200px;
     border-collapse: collapse;
     margin: 20px 0;
-    font-size: 14px;
+    font-size: 1.6rem;
     text-align: left;
 }
 
 .main-content th, .main-content td {
     padding: 10px;
     border-bottom: 1px solid #ddd;
-
+    font-size: 1.35rem;
+    font-family: 'roboto';
 }
 
 .main-content th {
@@ -506,3 +531,4 @@ form .checkbox-select-multiple label {
 form .checkbox-select-multiple input[type="checkbox"] {
     margin-right: 5px; /* Space between checkbox and label */
 }
+

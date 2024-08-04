@@ -17,17 +17,17 @@ from django.utils.safestring import mark_safe
 import re
 from django.urls import reverse
 from django.utils.html import format_html, escape
+from .wikipedia_utils import import_wikipedia_entries
 
 
 def index(request):
-    entries = list_entries()
-    entries = Entry.objects.all()
-
-    # Replace the below with logic to select specific entries
-    article_of_the_day = Entry.objects.first()  # Example, replace with actual logic
-    citizen_of_the_day = Entry.objects.all()[15]  # Example, replace with actual logic
-    on_this_day = Entry.objects.all()[7] # Example, replace with actual logic
-    story_of_the_day = Entry.objects.all()[19]  # Example, replace with actual logic
+    entries = Entry.objects.filter(category='person', thumbnail__isnull=False).order_by('-visit_count')[:20]
+    
+    # Ensure there are enough entries to avoid index errors
+    article_of_the_day = entries.first() if entries.exists() else None
+    citizen_of_the_day = entries[15] if entries.count() > 15 else None
+    on_this_day = entries[7] if entries.count() > 7 else None
+    story_of_the_day = entries[19] if entries.count() > 19 else None
 
     return render(request, 'encyclopedia/index.html', {
         'entries': entries,
@@ -35,8 +35,7 @@ def index(request):
         'citizen_of_the_day': citizen_of_the_day,
         'on_this_day': on_this_day,
         'story_of_the_day': story_of_the_day,
-    }
-    )
+    })
 
 def render_markdown(content):
     return markdown2.markdown(content, extras=["tables"])
@@ -58,12 +57,16 @@ def entry_page(request, title):
     bio_content_with_markdown = markdown2.markdown(entry.bio_content or "", extras=["tables", "fenced-code-blocks", "strike", "highlight", "metadata"])
     bio_content_with_markdown_safe = mark_safe(bio_content_with_markdown)
     reference = entry.reference.split(",") if entry.reference else []
+
+    birth_date = entry.birth_date.strftime("%m-%d-%Y") if entry.birth_date else ""
+
     return render(request, "entry.html", {
         "entry": entry,
         "content_with_markdown_safe": content_with_markdown_safe,
         "bio_content_with_markdown_safe": bio_content_with_markdown_safe,
         "reference": reference,
-        "tag": entry.tag.all()
+        "tag": entry.tag.all(),
+        "birth_date": birth_date
     })
 logger = logging.getLogger(__name__)
 
@@ -183,3 +186,9 @@ def profile(request):
         'user_profile': user_profile
     }
     return render(request, 'profile.html', context)
+
+def import_view(request):
+    if request.method == "POST":
+        import_wikipedia_entries()
+        return render(request, 'import_success.html')
+    return render(request, 'import.html')

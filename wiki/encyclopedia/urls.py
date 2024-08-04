@@ -15,7 +15,8 @@ urlpatterns = [
     path('registration/register/', register, name='register'),
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='index'), name='logout'),
-    path('accounts/profile/', profile, name='profile')
+    path('accounts/profile/', profile, name='profile'),
+    path('import/', views.import_view, name='import_view')
 ] 
 
 if settings.DEBUG:

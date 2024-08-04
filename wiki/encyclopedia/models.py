@@ -1,11 +1,17 @@
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
+from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.models import User
+import logging
 import os
 
-# Create your models here.
+logging.basicConfig(
+    filename='thumbnail_errors.log',
+    level=logging.ERROR,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+) 
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
@@ -16,7 +22,6 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
-    
 
 class Entry(models.Model):
 
@@ -35,7 +40,7 @@ class Entry(models.Model):
         ('book', 'Book')
     ]
 
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, unique=True)
     content = models.TextField()
     image = models.ImageField(upload_to='images/', null=True, blank=True)
     thumbnail = models.ImageField(upload_to='thumbnails/', blank=True, null=True)
@@ -43,47 +48,43 @@ class Entry(models.Model):
     tag = models.ManyToManyField(Tag, blank=True)
     reference = models.CharField(max_length=255, null=True, blank=True)
     bio_content = models.TextField(null=True, blank=True)
+    birth_date = models.DateField(null=True, blank=True)
+    visit_count = models.IntegerField(default=0)
 
-    def __str__(self):
-        return self.title
+    def entry_detail(request, pk):
+        entry = get_object_or_404(Entry, pk=pk)
+        entry.visit_count += 1
+        entry.save()
+        return render(request, 'encyclopedia/entry_detail.html', {'entry': entry})
 
     def save(self, *args, **kwargs):
-        # Save the entry to generate the image file path if it doesn't exist
         super().save(*args, **kwargs)
-        if self.image:
-            self.generate_thumbnail()
+        if self.image and hasattr(self.image, 'path'):
+            try:
+                self.generate_thumbnail()
+            except UnidentifiedImageError as e:
+                logging.error(f"Failed to generate thumbnail for {self.image.path}: {e}")
 
     def generate_thumbnail(self):
-        if not self.image:
-            return
+        try:
+            with Image.open(self.image.path) as image:
+                image.thumbnail((300, 300))
+                thumbnail_path = self.get_thumbnail_path()
+                image.save(thumbnail_path)
+                # Store the path relative to the media root
+                relative_thumbnail_path = os.path.relpath(thumbnail_path, 'media')
+                self.thumbnail = relative_thumbnail_path
+                super().save(update_fields=['thumbnail'])
+        except UnidentifiedImageError as e:
+            logging.error(f"Failed to open image file {self.image.path}: {e}")
+        except Exception as e:
+            logging.error(f"An error occurred while generating thumbnail for {self.image.path}: {e}")
 
-        image = Image.open(self.image.path)
-        image.thumbnail((200, 200), Image.LANCZOS)
-
-        thumbnail_name, thumbnail_extension = os.path.splitext(self.image.name)
-        thumbnail_extension = thumbnail_extension.lower()
-
-        thumbnail_filename = thumbnail_name + '_thumb' + thumbnail_extension
-        thumbnail_path = os.path.join('thumbnails/', thumbnail_filename)
-
-        # Ensure the directory exists
-        thumbnail_full_path = os.path.join(settings.MEDIA_ROOT, thumbnail_path)
-        os.makedirs(os.path.dirname(thumbnail_full_path), exist_ok=True)
-
-        if thumbnail_extension in ['.jpg', '.jpeg']:
-            filetype = 'JPEG'
-        elif thumbnail_extension == '.gif':
-            filetype = 'GIF'
-        elif thumbnail_extension == '.png':
-            filetype = 'PNG'
-        else:
-            return
-
-        # Save the thumbnail
-        image.save(thumbnail_full_path, filetype)
-        self.thumbnail = thumbnail_path
-        # Save the entry again to update the thumbnail path
-        super().save(update_fields=['thumbnail'])
+    def get_thumbnail_path(self):
+        filename, ext = os.path.splitext(os.path.basename(self.image.path))
+        thumbnail_dir = os.path.join(os.path.dirname(self.image.path), 'thumbnails')
+        os.makedirs(thumbnail_dir, exist_ok=True)
+        return os.path.join(thumbnail_dir, f'{filename}_thumb{ext}')
 
     def get_absolute_url(self):
         return reverse('entry_page', args=[str(self.title)])
